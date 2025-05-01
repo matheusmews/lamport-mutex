@@ -36,6 +36,10 @@ Run the pthread version:
 ```bash
 make run_pthread
 ```
+Run the automated tests to compare both verions:
+```bash
+make test.csv
+```
 
 ---
 
