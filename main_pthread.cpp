@@ -12,10 +12,9 @@
 #define handle_error(msg) \
   do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
-#define num_threads 3
-
-int shared_var = 0;
+int num_threads = 3;
 int num_rep = 3000000;
+int shared_var = 0;
 
 // MUTEX CODE BEGIN
 pthread_mutex_t lock;
@@ -44,25 +43,28 @@ static void * thread_start(void *arg)
 
 int main(int argc, char **argv)
 {
+    if (argc > 1)
+    num_rep = strtol(argv[1], NULL, 10);
+    
+    if (argc > 2)
+    num_threads = strtol(argv[2], NULL, 10);
+
     int thread_num, ret;
     struct thread_info tinfo[num_threads];
     pthread_attr_t attr;
     void *res;
-    
+
     // MUTEX CODE BEGIN    
     ret = pthread_mutex_init(&lock, NULL);
     if (ret != 0)
         handle_error_en(ret, "pthread_mutex_init");
     // MUTEX CODE END
     
-    if (argc > 1)
-        num_rep = strtol(argv[1], NULL, 10);
-    
     ret = pthread_attr_init(&attr);
     if (ret != 0)
         handle_error_en(ret, "pthread_attr_init");
     
-    /* Create one thread for each command-line argument */    
+    /* Create one thread for each command-line argument */
     for (thread_num = 0; thread_num < num_threads; thread_num++) {
         tinfo[thread_num].num = thread_num + 1;
         

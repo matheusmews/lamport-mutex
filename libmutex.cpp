@@ -10,21 +10,23 @@
 
 using namespace std;
 
-/* Variaveis compartilhadas */
-#define N 3
+#define MAX_NUM_THREADS 10
+bool choosing [MAX_NUM_THREADS];
+int ticket [MAX_NUM_THREADS];
 
-bool choosing [N];
-int ticket [N];
+int num_threads;
 
 int max_ticket() {
     int max = ticket[0];
-    for (int i = 1; i < N; i++)
+    for (int i = 1; i < num_threads; i++){
         max = ticket[i] > max ? ticket[i] : max;
+    }
     return max;
 }
 
-void lamport_mutex_init() {
-    for (int j = 0; j < N; j++) {
+void lamport_mutex_init(int n_thrds) {
+    num_threads = n_thrds;
+    for (int j = 0; j < num_threads; j++) {
         choosing[j] = false;
         ticket[j] = 0;
     }
@@ -34,10 +36,11 @@ void lamport_mutex_lock(int i) {
     choosing[i] = true;
     ticket[i] = max_ticket () + 1;
     choosing[i] = false;
-    for (int j = 0; j < N; j++) {
+    for (int j = 0; j < num_threads; j++) {
+        if(j == i) continue;
         while (choosing[j]) /* nao fazer nada */;
         while (ticket[j] != 0 && (
-                    (ticket[j] < ticket[i]) || (ticket[j] == ticket[i] && j < i)
+               (ticket[j] < ticket[i]) || (ticket[j] == ticket[i] && j < i)
         )) /* nao fazer nada */;
     }
 }
